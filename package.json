@@ -11,15 +11,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yandex-praktikum/express-mesto-gha.git"
+    "url": "git+https://github.com/NadezhdaTerenteva/express-mesto-gha.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/yandex-praktikum/express-mesto-gha/issues"
-  },
-  "homepage": "https://github.com/yandex-praktikum/express-mesto-gha#readme",
+  
   "dependencies": {
     "express": "^4.18.1",
     "mongoose": "^6.5.2"
