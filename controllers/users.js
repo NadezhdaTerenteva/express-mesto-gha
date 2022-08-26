@@ -15,16 +15,7 @@ const getUsers = (req, res) => {
   User.find({})
     .then(users => res.send({ data: users }))
     .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
-  // res.send(users);
 }
-
-// const getUserById = (req, res) => {
-  // if (!users[req.params.id]) {
-    // res.send(`Такого пользователя не существует`);
-    // return;
-  // }
-  // res.send(users[req.params.id])
-// }
 
 const getUserById = (req, res) => {
   User.findById(req.params.id)
@@ -32,8 +23,34 @@ const getUserById = (req, res) => {
     .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
 }
 
-module.export = {
+const updateUser = (req, res) => {
+  // обновим имя найденного по _id пользователя
+  User.findByIdAndUpdate(req.user._id,
+    { name: 'Надежда Терентьева', about: 'Студент Я.Практикума'},
+    // Передадим объект опций:
+    {
+      new: true, // обработчик then получит на вход обновлённую запись
+      runValidators: true, // данные будут валидированы перед изменением
+  })
+  .then(user => res.send({ data: user }))
+  .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+}
+
+const updateAvatar = (req, res) => {
+  User.findByIdAndUpdate(req.user._id,
+    { avatar: 'https://i.pinimg.com/474x/ef/f3/9a/eff39a70bf5bc86c932bccbda58cd238.jpg'},
+    {
+      new: true,
+      runValidators: true,
+  })
+  .then(user => res.send({ data: user }))
+  .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+}
+
+module.exports = {
   createUser,
   getUsers,
-  getUserById
+  getUserById,
+  updateUser,
+  updateAvatar
 }

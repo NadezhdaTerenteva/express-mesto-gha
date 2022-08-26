@@ -11,12 +11,20 @@ const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   // useCreateIndex: true,
-  //   useFindAndModify: false
+  // useFindAndModify: false
 });
 
 // подключаем мидлвары, роуты и всё остальное...
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
+
+app.use((req, res, next) => {
+  req.user = {
+    _id: '6308d34017082be12f8d85ab' // вставьте сюда _id созданного в предыдущем пункте пользователя
+  };
+
+  next();
+});
 
 
 app.listen(PORT, () => {

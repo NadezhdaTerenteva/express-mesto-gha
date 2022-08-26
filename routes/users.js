@@ -1,12 +1,20 @@
 const express = require('express');
-const userRouter = express.Router(); // создали роутер
+const router = express.Router(); // создали роутер
 
-const { createUser, getUsers, getUserById } = require('../controllers/users.js')
+const { createUser,
+  getUsers,
+  getUserById,
+  updateUser,
+  updateAvatar } = require('../controllers/users.js')
 
-userRouter.get('/', express.json(), getUsers);
+router.get('/', express.json(), getUsers);
 
-userRouter.get('/:userId', express.json(), getUserById);
+router.get('/:userId', express.json(), getUserById);
 
-userRouter.post('/', express.json(), createUser);
+router.post('/', express.json(), createUser);
 
-module.exports = userRouter; // экспортировали роутер
+router.patch('/me', express.json(), updateUser);
+
+router.patch('/me/avatar', express.json(), updateAvatar);
+
+module.exports = router; // экспортировали роутер

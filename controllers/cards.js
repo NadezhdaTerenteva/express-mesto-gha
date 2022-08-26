@@ -1,7 +1,8 @@
 const Card = require('../models/card.js');
 
 const createCard = (req, res) => {
-  const { name, link } = req.body; // получим из объекта запроса имя и описание пользователя
+  console.log(req.user._id); // _id станет доступен
+  const { name, link } = req.body;
 
   Card.create({ name, link }) // создадим документ на основе пришедших данных
   // вернём записанные в базу данные
@@ -22,8 +23,22 @@ const deleteCardById = (req, res) => {
     .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
 }
 
-module.export = {
+const likeCard = (req, res) => Card.findByIdAndUpdate(
+  req.params.cardId,
+  { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+  { new: true },
+)
+
+const dislikeCard = (req, res) => Card.findByIdAndUpdate(
+  req.params.cardId,
+  { $pull: { likes: req.user._id } }, // убрать _id из массива
+  { new: true },
+) 
+
+module.exports = {
   createCard,
   getCards,
-  deleteCardById
+  deleteCardById,
+  likeCard,
+  dislikeCard
 }
