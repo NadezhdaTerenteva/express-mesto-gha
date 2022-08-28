@@ -8,7 +8,7 @@ const createUser = (req, res) => {
   }
   User.create({ name, about, avatar }) // создадим документ на основе пришедших данных
   // вернём записанные в базу данные
-  .then(user => res.send({ data: user }))
+  .then(user => res.status(200).send({ data: user }))
   // данные не записались, вернём ошибку
   .catch(err => res.status(500).send({ message: 'Произошла ошибка на сервере'}));
 };
@@ -21,13 +21,17 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
   const { userId } = req.params;
+  if (!userId) {
+    res.status(400).send({ message: 'Передан некорректный id' });
+      return;
+  }
   User.findById(userId)
   .then((user) => {
     if (!user) {
       res.status(404).send({ message: 'Такого пользователя не существует' });
       return;
     }
-    res.status(200).send(user);
+    res.status(200).send({ data: user });
     })
   .catch(() => res.status(500).send({ message: 'Произошла ошибка на сервере' }));
 }
