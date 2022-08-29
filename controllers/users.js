@@ -1,14 +1,18 @@
 const User = require("../models/user.js");
 
+const { hasLengthError } = require("./validators.js");
 const mongoUpdateParams = {
   new: true, // обработчик then получит на вход обновлённую запись
   runValidators: true, // данные будут валидированы перед изменением
 };
 
+const minlength = 2;
+const maxlength = 30;
+
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body; // получим из объекта запроса имя и описание пользователя
 
-  let validationError = checkValidation(req.body);
+  let validationError = checkValidationCreate(req.body);
 
   if (validationError === true) {
     res.status(400).send({
@@ -55,8 +59,8 @@ const getUserById = (req, res) => {
 
 const updateUser = (req, res) => {
   // обновим имя найденного по _id пользователя
-
-  let validationError = checkValidation(req.body);
+  const { name, about} = req.body;
+  let validationError = checkValidationUpdate(req.body);
 
   if (validationError === true) {
     res
@@ -66,7 +70,7 @@ const updateUser = (req, res) => {
   }
   User.findByIdAndUpdate(
     req.user._id,
-    req.body,
+    { name, about},
     // Передадим объект опций:
     mongoUpdateParams
   )
@@ -102,7 +106,7 @@ const updateAvatar = (req, res) => {
     );
 };
 
-const checkValidation = ({ name, about, avatar }) => {
+const checkValidationCreate = ({ name, about, avatar }) => {
   let validationError = false;
 
   if (!name || !about || !avatar) {
@@ -110,14 +114,29 @@ const checkValidation = ({ name, about, avatar }) => {
   }
 
   if (validationError === false) {
-    const nameLength = name.length;
-    const aboutLength = about.length;
-    validationError =
-      nameLength < 2 || nameLength > 30 || aboutLength < 2 || aboutLength > 30;
+
+    validationError = hasLengthError(name, minlength, maxlength)
+      || hasLengthError(about, minlength, maxlength);
   }
 
   return validationError;
 };
+
+const checkValidationUpdate = ({ name, about }) => {
+  let validationError = false;
+
+  if (!name || !about ) {
+    validationError = true;
+  }
+
+  if (validationError === false) {
+    validationError = hasLengthError(name, minlength, maxlength)
+      || hasLengthError(about, minlength, maxlength);
+  }
+
+  return validationError;
+};
+
 
 module.exports = {
   createUser,

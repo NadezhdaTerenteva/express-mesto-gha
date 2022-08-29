@@ -1,20 +1,26 @@
 const Card = require("../models/card.js");
+const { hasLengthError } = require("./validators.js");
+
+const minlength = 2;
+const maxlength = 30;
 
 const createCard = (req, res) => {
   console.log(req.user._id); // _id станет доступен
   const { name, link } = req.body;
-  if (!name || !link) {
+  if (!name || !link || hasLengthError(name, minlength, maxlength)) {
     res
       .status(400)
       .send({ message: "Переданы некорректные данные при создании карточки" });
     return;
   }
-  Card.create({ name, link }) // создадим документ на основе пришедших данных
+  Card.create({ name, link, owner: req.user }) // создадим документ на основе пришедших данных
     // вернём записанные в базу данные
     .then((card) => res.send({ data: card }))
     // данные не записались, вернём ошибку
-    .catch((err) =>
+    .catch((err) =>{
+      console.error(err);
       res.status(500).send({ message: "Произошла ошибка на сервере" })
+    }
     );
 };
 
