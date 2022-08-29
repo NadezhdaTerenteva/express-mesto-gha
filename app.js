@@ -25,6 +25,10 @@ app.use((req, res, next) => {
 app.use("/users", userRouter);
 app.use("/cards", cardRouter);
 
+app.all('*', express.json(), function(req, res){
+  res.status(404).send({ message: "Запрашиваемая страница не найдена"});
+});
+
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
   console.log(`App listening on port ${PORT}`);
