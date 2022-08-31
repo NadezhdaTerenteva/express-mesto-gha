@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const ObjectId = require("mongodb").ObjectId;
+const mongoose = require('mongoose');
+const { ObjectId } = require('mongodb');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -20,7 +20,7 @@ const cardSchema = new mongoose.Schema({
     {
       type: ObjectId,
       default: [],
-      ref: "user"
+      ref: 'user',
     },
   ],
   createdAt: {
@@ -29,4 +29,4 @@ const cardSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("card", cardSchema);
+module.exports = mongoose.model('card', cardSchema);

@@ -1,4 +1,5 @@
-const express = require("express");
+const express = require('express');
+
 const router = express.Router(); // создали роутер
 
 const {
@@ -7,16 +8,16 @@ const {
   getUserById,
   updateUser,
   updateAvatar,
-} = require("../controllers/users.js");
+} = require('../controllers/users');
 
-router.get("/", express.json(), getUsers);
+router.get('/', getUsers);
 
-router.get("/:userId", express.json(), getUserById);
+router.get('/:userId', getUserById);
 
-router.post("/", express.json(), createUser);
+router.post('/', createUser);
 
-router.patch("/me", express.json(), updateUser);
+router.patch('/me', updateUser);
 
-router.patch("/me/avatar", express.json(), updateAvatar);
+router.patch('/me/avatar', updateAvatar);
 
 module.exports = router; // экспортировали роутер

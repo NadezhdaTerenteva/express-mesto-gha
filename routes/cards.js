@@ -1,4 +1,5 @@
-const express = require("express");
+const express = require('express');
+
 const cardRouter = express.Router(); // создали роутер
 
 const {
@@ -7,16 +8,16 @@ const {
   deleteCardById,
   likeCard,
   dislikeCard,
-} = require("../controllers/cards.js");
+} = require('../controllers/cards');
 
-cardRouter.get("/", express.json(), getCards);
+cardRouter.get('/', getCards);
 
-cardRouter.delete("/:cardId", express.json(), deleteCardById);
+cardRouter.delete('/:cardId', deleteCardById);
 
-cardRouter.post("/", express.json(), createCard);
+cardRouter.post('/', createCard);
 
-cardRouter.put("/:cardId/likes", express.json(), likeCard);
+cardRouter.put('/:cardId/likes', likeCard);
 
-cardRouter.delete("/:cardId/likes", express.json(), dislikeCard);
+cardRouter.delete('/:cardId/likes', dislikeCard);
 
 module.exports = cardRouter; // экспортировали роутер
