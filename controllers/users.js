@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { STATUS_NOT_FOUND, STATUS_BAD_REQUEST } = require('./constants');
 const { errorHandler } = require('./errorHandler');
@@ -7,14 +9,55 @@ const mongoUpdateParams = {
   runValidators: true, // данные будут валидированы перед изменением
 };
 
-const createUser = (req, res) => {
-  const { name, about, avatar } = req.body; // получим из объекта запроса имя, описание пользователя
+const createUser = (req, res, next) => {
+  const {
+    email,
+    password,
+    name,
+    about,
+    avatar,
+  } = req.body; // получим из объекта запроса имя,
 
-  User.create({ name, about, avatar }) // создадим документ на основе пришедших данных
-    // вернём записанные в базу данные
-    .then((user) => res.status(200).send({ data: user }))
-    // данные не записались, вернём ошибку
-    .catch((err) => errorHandler(err, res));
+  bcrypt.hash(password, 10)
+    .then((hashedPassword) => {
+      User.create({
+        email,
+        password: hashedPassword,
+        name,
+        about,
+        avatar,
+      })
+        .then((user) => res.status(200).send({ data: user })
+        // данные не записались, вернём ошибку
+          .catch(next));
+    })
+    .catch(next);
+};
+
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.findOne({ email })
+    .select('+password')
+    .orFail(() => new Error('Пользователь не найден'))
+    .then((user) => {
+      bcrypt.compare(password, user.password)
+        .then((isUserValid) => {
+          if (isUserValid) {
+            const token = jwt.sign({ _id: user._id }, 'secret');
+
+            res.cookie('jwt', token, {
+              expiresIn: '7d',
+              httpOnly: true,
+              sameSite: true,
+            });
+            res.send({ data: user.toJSON() });
+          } else {
+            res.status(403).send({ message: 'Неправильный пароль' });
+          }
+        });
+    })
+    .catch(next);
 };
 
 const getUsers = (req, res) => {
@@ -29,7 +72,9 @@ const getUserById = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(STATUS_NOT_FOUND).send({ message: 'Такого пользователя не существует' });
+        res
+          .status(STATUS_NOT_FOUND)
+          .send({ message: 'Такого пользователя не существует' });
         return;
       }
       res.status(200).send({ data: user });
@@ -49,7 +94,9 @@ const updateUser = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(STATUS_NOT_FOUND).send({ message: 'Такого пользователя не существует' });
+        res
+          .status(STATUS_NOT_FOUND)
+          .send({ message: 'Такого пользователя не существует' });
         return;
       }
       res.status(200).send(user);
@@ -60,14 +107,18 @@ const updateUser = (req, res) => {
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
   if (!avatar) {
-    res.status(STATUS_BAD_REQUEST).send({ message: 'Передано некорректное поле Аватар' });
+    res
+      .status(STATUS_BAD_REQUEST)
+      .send({ message: 'Передано некорректное поле Аватар' });
     return;
   }
 
   User.findByIdAndUpdate(req.user._id, { avatar }, mongoUpdateParams)
     .then((user) => {
       if (!user) {
-        res.status(STATUS_NOT_FOUND).send({ message: 'Такого пользователя не существует' });
+        res
+          .status(STATUS_NOT_FOUND)
+          .send({ message: 'Такого пользователя не существует' });
         return;
       }
       res.status(200).send(user);
@@ -77,6 +128,7 @@ const updateAvatar = (req, res) => {
 
 module.exports = {
   createUser,
+  login,
   getUsers,
   getUserById,
   updateUser,

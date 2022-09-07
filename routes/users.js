@@ -3,7 +3,6 @@ const express = require('express');
 const router = express.Router(); // создали роутер
 
 const {
-  createUser,
   getUsers,
   getUserById,
   updateUser,
@@ -13,8 +12,6 @@ const {
 router.get('/', getUsers);
 
 router.get('/:userId', getUserById);
-
-router.post('/', createUser);
 
 router.patch('/me', updateUser);
 

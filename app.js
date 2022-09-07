@@ -1,7 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 const userRouter = require('./routes/users'); // импортируем роутер
 const cardRouter = require('./routes/cards');
+
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -22,7 +26,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(cookieParser());
 app.use(express.json());
+app.post('/signup', createUser);
+app.post('/signin', login);
+app.use(auth);
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 
