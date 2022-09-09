@@ -23,7 +23,10 @@ const getCards = (req, res) => {
 const deleteCardById = (req, res) => {
   const { cardId } = req.params;
 
-  Card.findByIdAndRemove(cardId)
+  Card.findOneAndRemove({
+    _id: cardId,
+    owner: req.user._id,
+  })
     .then((cards) => {
       if (!cards) {
         res
@@ -31,7 +34,7 @@ const deleteCardById = (req, res) => {
           .send({ message: 'По переданному _id карточка не найдена' });
         return;
       }
-      res.send({ data: cards });
+      res.send();
     })
     .catch((err) => errorHandler(err, res));
 };
