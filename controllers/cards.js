@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const UnauthorizedError = require('../errors/unauthorized-error');
+const ForbiddenError = require('../errors/forbidden-error');
 
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
@@ -21,15 +22,17 @@ const getCards = (req, res, next) => {
 const deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
 
-  Card.findOneAndRemove({
-    _id: cardId,
-    owner: req.user._id,
-  })
-    .then((cards) => {
-      if (!cards) {
-        throw new UnauthorizedError('Невозможно удалить карточку другого пользователя');
+  Card.findById(cardId)
+    .then((card) => {
+      if (!card) {
+        throw new NotFoundError('Не найдена карточка по переданному id');
       }
-      res.send();
+
+      if (card.owner._id !== req.user._id) {
+        throw new ForbiddenError('Невозможно удалить карточку другого пользователя');
+      }
+
+      res.send({ message: 'Карточка удалена' });
     })
     .catch(next);
 };
