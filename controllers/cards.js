@@ -1,6 +1,5 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
-const UnauthorizedError = require('../errors/unauthorized-error');
 const ForbiddenError = require('../errors/forbidden-error');
 
 const createCard = (req, res, next) => {
@@ -28,7 +27,7 @@ const deleteCardById = (req, res, next) => {
         throw new NotFoundError('Не найдена карточка по переданному id');
       }
 
-      if (card.owner._id !== req.user._id) {
+      if (String(card.owner) !== String(req.user._id)) {
         throw new ForbiddenError('Невозможно удалить карточку другого пользователя');
       }
 
