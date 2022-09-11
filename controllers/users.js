@@ -34,6 +34,7 @@ const createUser = async (req, res, next) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await User.create({
       email,
       password: hashedPassword,
@@ -41,10 +42,13 @@ const createUser = async (req, res, next) => {
       about,
       avatar,
     });
+
     res.status(200).send({ data: user });
   } catch (err) {
-    if (err.code === 409) {
+    if (err.code === 11000) {
       next(new ConflictError('Пользователь с таким email уже существует'));
+    } else {
+      next(err);
     }
   }
 };

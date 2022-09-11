@@ -1,27 +1,24 @@
 const Card = require('../models/card');
-const { errorHandler } = require('./errorHandler');
 const NotFoundError = require('../errors/not-found-err');
 const UnauthorizedError = require('../errors/unauthorized-error');
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user }) // создадим документ на основе пришедших данных
     // вернём записанные в базу данные
     .then((card) => res.send({ data: card }))
     // данные не записались, вернём ошибку
-    .catch((err) => {
-      errorHandler(err, res);
-    });
+    .catch(next);
 };
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => errorHandler(err, res));
+    .catch(next);
 };
 
-const deleteCardById = (req, res) => {
+const deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findOneAndRemove({
@@ -34,10 +31,10 @@ const deleteCardById = (req, res) => {
       }
       res.send();
     })
-    .catch((err) => errorHandler(err, res));
+    .catch(next);
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(
@@ -51,12 +48,10 @@ const likeCard = (req, res) => {
       }
       res.send({ data: cards });
     })
-    .catch((err) => {
-      errorHandler(err, res);
-    });
+    .catch(next);
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(
@@ -70,7 +65,7 @@ const dislikeCard = (req, res) => {
       }
       res.send({ data: cards });
     })
-    .catch((err) => errorHandler(err, res));
+    .catch(next);
 };
 
 module.exports = {
