@@ -4,7 +4,7 @@ const auth = (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (!token) {
-    res.send(401);
+    res.status(401).send({ message: 'Ошибка авторизации' });
     return;
   }
   let payload;
