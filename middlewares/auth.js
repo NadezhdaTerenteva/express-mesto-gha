@@ -1,10 +1,12 @@
 const jwt = require('jsonwebtoken');
 
+const STATUS_UNAUTHORIZED = require('../controllers/constants');
+
 const auth = (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (!token) {
-    res.status(401).send({ message: 'Ошибка авторизации' });
+    res.status(STATUS_UNAUTHORIZED).send({ message: 'Ошибка авторизации' });
     return;
   }
   let payload;
