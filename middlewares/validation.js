@@ -5,7 +5,7 @@ const linkValidator = /^((http|https):\/\/)?(www\.)?([A-Za-zА-Яа-я0-9]{1}[A-
 const authorizationValidator = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
   }),
 });
 
@@ -15,7 +15,7 @@ const registrationValidator = celebrate({
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().pattern(linkValidator),
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
   }),
 });
 

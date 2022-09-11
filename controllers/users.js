@@ -1,17 +1,13 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const {
-  STATUS_NOT_FOUND,
-  STATUS_BAD_REQUEST,
-  STATUS_UNAUTHORIZED,
-  STATUS_FORBIDDEN,
-} = require('./constants');
+
 const { errorHandler } = require('./errorHandler');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-error');
 const ForbiddenError = require('../errors/forbidden-error');
 const UnauthorizedError = require('../errors/unauthorized-error');
+const ConflictError = require('../errors/conflict-error');
 
 const mongoUpdateParams = {
   new: true, // обработчик then получит на вход обновлённую запись
@@ -33,7 +29,7 @@ const createUser = async (req, res, next) => {
   } = req.body; // получим из объекта запроса имя,
 
   if (await userExists(email)) {
-    throw new BadRequestError('Пользователь с таким email уже существует');
+    throw new ConflictError('Пользователь с таким email уже существует');
   }
 
   try {

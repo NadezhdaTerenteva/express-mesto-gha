@@ -1,6 +1,7 @@
 const Card = require('../models/card');
-const { STATUS_NOT_FOUND } = require('./constants');
 const { errorHandler } = require('./errorHandler');
+const NotFoundError = require('../errors/not-found-err');
+const UnauthorizedError = require('../errors/unauthorized-error');
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
@@ -29,10 +30,7 @@ const deleteCardById = (req, res) => {
   })
     .then((cards) => {
       if (!cards) {
-        res
-          .status(STATUS_NOT_FOUND)
-          .send({ message: 'По переданному _id карточка не найдена' });
-        return;
+        throw new UnauthorizedError('Невозможно удалить карточку другого пользователя');
       }
       res.send();
     })
@@ -49,10 +47,7 @@ const likeCard = (req, res) => {
   )
     .then((cards) => {
       if (!cards) {
-        res
-          .status(STATUS_NOT_FOUND)
-          .send({ message: 'По переданному _id карточка не найдена' });
-        return;
+        throw new NotFoundError('По переданному _id карточка не найдена');
       }
       res.send({ data: cards });
     })
@@ -71,10 +66,7 @@ const dislikeCard = (req, res) => {
   )
     .then((cards) => {
       if (!cards) {
-        res
-          .status(STATUS_NOT_FOUND)
-          .send({ message: 'По переданному _id карточка не найдена' });
-        return;
+        throw new NotFoundError('По переданному _id карточка не найдена');
       }
       res.send({ data: cards });
     })
