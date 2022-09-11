@@ -5,11 +5,14 @@ console.log(process.env.JWT_SECRET);
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 const userRouter = require('./routes/users'); // импортируем роутер
 const cardRouter = require('./routes/cards');
+const { authorizationValidator, registrationValidator } = require('./middlewares/validation');
 
 const { createUser, login } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
+const generalErrorHandler = require('./middlewares/generalErrorHandler');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -24,8 +27,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(express.json());
 app.use(cookieParser());
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post('/signup', registrationValidator, createUser);
+app.post('/signin', authorizationValidator, login);
 app.use(auth);
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
@@ -34,19 +37,9 @@ app.all('*', express.json(), (req, res) => {
   res.status(404).send({ message: 'Запрашиваемая страница не найдена' });
 });
 
-app.use((err, req, res, next) => {
-  // если у ошибки нет статуса, выставляем 500
-  const { statusCode = 500, message } = err;
+app.use(errors()); // обработчик ошибок celebrate
 
-  res
-    .status(statusCode)
-    .send({
-      // проверяем статус и выставляем сообщение в зависимости от него
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-});
+app.use(generalErrorHandler);
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает

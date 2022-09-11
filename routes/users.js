@@ -1,4 +1,5 @@
 const express = require('express');
+const { userValidator, userIdValidator, avatarValidator } = require('../middlewares/validation');
 
 const router = express.Router(); // создали роутер
 
@@ -12,10 +13,10 @@ const {
 
 router.get('/', getUsers);
 router.get('/me', getUser);
-router.get('/:userId', getUserById);
+router.get('/:userId', userIdValidator, getUserById);
 
-router.patch('/me', updateUser);
+router.patch('/me', userValidator, updateUser);
 
-router.patch('/me/avatar', updateAvatar);
+router.patch('/me/avatar', avatarValidator, updateAvatar);
 
 module.exports = router; // экспортировали роутер
