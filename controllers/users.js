@@ -14,10 +14,10 @@ const mongoUpdateParams = {
   runValidators: true, // данные будут валидированы перед изменением
 };
 
-const userExists = async (email) => {
-  const user = await User.findOne({ email });
-  return !!user;
-};
+// const userExists = async (email) => {
+//   const user = await User.findOne({ email });
+//   return !!user;
+// };
 
 const createUser = async (req, res, next) => {
   const {
@@ -28,9 +28,9 @@ const createUser = async (req, res, next) => {
     avatar,
   } = req.body; // получим из объекта запроса имя,
 
-  if (await userExists(email)) {
-    throw new ConflictError('Пользователь с таким email уже существует');
-  }
+  // if (await userExists(email)) {
+  //   throw new ConflictError('Пользователь с таким email уже существует');
+  // }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -43,7 +43,9 @@ const createUser = async (req, res, next) => {
     });
     res.status(200).send({ data: user });
   } catch (err) {
-    next(err);
+    if (err.code === 409) {
+      next(new ConflictError('Пользователь с таким email уже существует'));
+    }
   }
 };
 
