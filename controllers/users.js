@@ -59,10 +59,10 @@ const login = (req, res, next) => {
   if (!email || !password) {
     throw new ForbiddenError('Поля должны быть заполнены');
   }
-
+  const errorMsg = 'Неправильные почта или пароль';
   User.findOne({ email })
     .select('+password')
-    .orFail(() => new Error('Пользователь не найден'))
+    .orFail(() => new UnauthorizedError(errorMsg))
     .then((user) => {
       bcrypt.compare(password, user.password)
         .then((isUserValid) => {
@@ -76,7 +76,7 @@ const login = (req, res, next) => {
             });
             res.send({ data: user.toJSON() });
           } else {
-            throw new UnauthorizedError('Неправильные почта или пароль');
+            throw new UnauthorizedError(errorMsg);
           }
         });
     })
