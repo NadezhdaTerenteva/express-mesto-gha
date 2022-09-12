@@ -2,10 +2,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const { errorHandler } = require('./errorHandler');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-error');
-const ForbiddenError = require('../errors/forbidden-error');
 const UnauthorizedError = require('../errors/unauthorized-error');
 const ConflictError = require('../errors/conflict-error');
 
@@ -13,11 +11,6 @@ const mongoUpdateParams = {
   new: true, // обработчик then получит на вход обновлённую запись
   runValidators: true, // данные будут валидированы перед изменением
 };
-
-// const userExists = async (email) => {
-//   const user = await User.findOne({ email });
-//   return !!user;
-// };
 
 const createUser = async (req, res, next) => {
   const {
@@ -27,10 +20,6 @@ const createUser = async (req, res, next) => {
     about,
     avatar,
   } = req.body; // получим из объекта запроса имя,
-
-  // if (await userExists(email)) {
-  //   throw new ConflictError('Пользователь с таким email уже существует');
-  // }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -47,8 +36,11 @@ const createUser = async (req, res, next) => {
   } catch (err) {
     if (err.code === 11000) {
       next(new ConflictError('Пользователь с таким email уже существует'));
-    } else {
-      next(err);
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Некорректные данные при создании пользователя'));
+      } else {
+        next(err);
+      }
     }
   }
 };
@@ -56,37 +48,32 @@ const createUser = async (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    throw new ForbiddenError('Поля должны быть заполнены');
-  }
   const errorMsg = 'Неправильные почта или пароль';
   User.findOne({ email })
     .select('+password')
     .orFail(() => new UnauthorizedError(errorMsg))
-    .then((user) => {
-      bcrypt.compare(password, user.password)
-        .then((isUserValid) => {
-          if (isUserValid) {
-            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+    .then((user) => bcrypt.compare(password, user.password)
+      .then((isUserValid) => {
+        if (isUserValid) {
+          const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 
-            res.cookie('jwt', token, {
-              httpOnly: true,
-              sameSite: true,
-              maxAge: 3600000 * 24 * 7,
-            });
-            res.send({ data: user.toJSON() });
-          } else {
-            throw new UnauthorizedError(errorMsg);
-          }
-        });
-    })
+          res.cookie('jwt', token, {
+            httpOnly: true,
+            sameSite: true,
+            maxAge: 3600000 * 24 * 7,
+          });
+          res.send({ data: user.toJSON() });
+        } else {
+          throw new UnauthorizedError(errorMsg);
+        }
+      }))
     .catch(next);
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => errorHandler(err, res));
+    .catch(next);
 };
 
 const getUserById = (req, res, next) => {
@@ -129,14 +116,17 @@ const updateUser = (req, res, next) => {
       }
       res.status(200).send(user);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Некорректные данные пользователя'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  if (!avatar) {
-    throw new BadRequestError('Передано некорректное поле Аватар');
-  }
 
   User.findByIdAndUpdate(req.user._id, { avatar }, mongoUpdateParams)
     .then((user) => {
@@ -145,7 +135,13 @@ const updateAvatar = (req, res, next) => {
       }
       res.status(200).send(user);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Некорректные данные пользователя'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports = {

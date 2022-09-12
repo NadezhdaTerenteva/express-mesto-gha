@@ -14,8 +14,8 @@
     "type": "git",
     "url": "git+https://github.com/NadezhdaTerenteva/express-mesto-gha.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["backend application", "express"],
+  "author": "NadezhdaTerenteva",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",

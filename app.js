@@ -4,12 +4,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
-const userRouter = require('./routes/users'); // импортируем роутер
-const cardRouter = require('./routes/cards');
-const { authorizationValidator, registrationValidator } = require('./middlewares/validation');
+const routes = require('./routes/index');
 
-const { createUser, login } = require('./controllers/users');
-const { auth } = require('./middlewares/auth');
+// const userRouter = require('./routes/users'); // импортируем роутер
+// const cardRouter = require('./routes/cards');
+// const { authorizationValidator, registrationValidator } = require('./middlewares/validation');
+// const NotFoundError = require('./errors/not-found-err');
+
+// const { createUser, login } = require('./controllers/users');
+// const { auth } = require('./middlewares/auth');
 const generalErrorHandler = require('./middlewares/generalErrorHandler');
 
 // Слушаем 3000 порт
@@ -25,15 +28,16 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(express.json());
 app.use(cookieParser());
-app.post('/signup', registrationValidator, createUser);
-app.post('/signin', authorizationValidator, login);
-app.use(auth);
-app.use('/users', userRouter);
-app.use('/cards', cardRouter);
+app.use(routes);
+// app.post('/signup', registrationValidator, createUser);
+// app.post('/signin', authorizationValidator, login);
+// app.use(auth);
+// app.use('/users', userRouter);
+// app.use('/cards', cardRouter);
 
-app.all('*', express.json(), (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемая страница не найдена' });
-});
+// app.all('*', express.json(), (req, res, next) => {
+//   next(new NotFoundError('Запрашиваемая страница не найдена'));
+// });
 
 app.use(errors()); // обработчик ошибок celebrate
 

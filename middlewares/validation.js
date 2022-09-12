@@ -35,7 +35,7 @@ const avatarValidator = celebrate({
 const userIdValidator = celebrate({
   // валидируем параметры
   params: Joi.object().keys({
-    userId: Joi.string().alphanum().length(24),
+    userId: Joi.string().length(24).hex().required(),
   }),
 });
 
@@ -49,7 +49,7 @@ const cardValidator = celebrate({
 const cardIdValidator = celebrate({
   // валидируем параметры
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    cardId: Joi.string().length(24).hex().required(),
   }),
 });
 
