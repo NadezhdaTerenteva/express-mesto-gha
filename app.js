@@ -5,14 +5,6 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const routes = require('./routes/index');
-
-// const userRouter = require('./routes/users'); // импортируем роутер
-// const cardRouter = require('./routes/cards');
-// const { authorizationValidator, registrationValidator } = require('./middlewares/validation');
-// const NotFoundError = require('./errors/not-found-err');
-
-// const { createUser, login } = require('./controllers/users');
-// const { auth } = require('./middlewares/auth');
 const generalErrorHandler = require('./middlewares/generalErrorHandler');
 
 // Слушаем 3000 порт

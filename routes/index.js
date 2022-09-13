@@ -15,9 +15,6 @@ router.post('/signin', authorizationValidator, login);
 router.use(auth);
 router.use('/users', userRouter);
 router.use('/cards', cardRouter);
-router.get('/signout', (req, res) => {
-  res.clearCookie('jwt').send({ message: 'Выход' });
-});
 
 router.all('*', express.json(), (req, res, next) => {
   next(new NotFoundError('Запрашиваемая страница не найдена'));
