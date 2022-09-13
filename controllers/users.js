@@ -55,7 +55,7 @@ const login = (req, res, next) => {
     .then((user) => bcrypt.compare(password, user.password)
       .then((isUserValid) => {
         if (isUserValid) {
-          const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+          const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET || 'secret');
 
           res.cookie('jwt', token, {
             httpOnly: true,
