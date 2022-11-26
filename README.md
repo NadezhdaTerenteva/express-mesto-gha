@@ -1,16 +1,16 @@
-Данный проект представляет собой первый этап разработки бэкенда для проекта Место (фронтенд можно посмотреть по [ссылке](https://nadezhdaterenteva.github.io/mesto-react/)).
+This is a first step of developing backend part of project Mesto (forntend you can see under [the link](https://nadezhdaterenteva.github.io/mesto-react/)).
 
-## Директории
+### Directories
 
-`/routes` — папка с файлами роутера  
-`/controllers` — папка с файлами контроллеров пользователя и карточки   
-`/models` — папка с файлами описания схем пользователя и карточки  
+`/routes` — folder with router files;  
+`/controllers` — folder with controllers' of the user and the cards;   
+`/models` — description of the user & card schemas.
   
-## Запуск проекта
+### Project run
 
-`npm run start` — запускает сервер   
-`npm run dev` — запускает сервер с hot-reload
+`npm run start` — starting server   
+`npm run dev` — starting server with hot-reload
 
-Репозиторий доступен по [ссылке](https://github.com/NadezhdaTerenteva/express-mesto-gha).
+Repository is to be find under [the link](https://github.com/NadezhdaTerenteva/express-mesto-gha).
 
 
